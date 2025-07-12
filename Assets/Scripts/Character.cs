@@ -7,6 +7,8 @@ public class Character : MonoBehaviour
     //Referances
     private Animator animator;
     private Rigidbody rb;
+    [SerializeField] private LayerMask ground;
+    [SerializeField] private LayerMask corner;
 
     //Movement
     private bool canMove;
@@ -26,14 +28,14 @@ public class Character : MonoBehaviour
 
     void Update()
     {
-        if (canMove && IsGrounded())
+        if (canMove && (IsOnGrounded() || IsOnCorner()))
             rb.velocity = new Vector3(transform.forward.x * moveSpeed, rb.velocity.y, transform.forward.z * moveSpeed);
 
     }
 
     public void StartRunning()
     {
-        if (IsRotationCloseToZero())
+        if (IsRotationCloseToZero() || !IsOnGrounded())
             return;
 
         StartCoroutine(TurnAndRun());
@@ -65,10 +67,16 @@ public class Character : MonoBehaviour
         return Mathf.Abs(Mathf.DeltaAngle(yRotation, 0f)) < threshold;
     }
 
-    private bool IsGrounded()
+    private bool IsOnGrounded()
     {
         // Check if the character is grounded using a raycast
-        return Physics.Raycast(groundCheck.position, Vector3.down, groundCheckDist);
+        return Physics.Raycast(groundCheck.position, Vector3.down, groundCheckDist, ground);
+    }
+
+    private bool IsOnCorner()
+    {
+        // Check if the character is grounded using a raycast
+        return Physics.Raycast(groundCheck.position, Vector3.down, groundCheckDist, corner);
     }
 
     private void OnDrawGizmos()
