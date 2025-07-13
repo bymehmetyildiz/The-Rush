@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cinemachine;
 
 public class Character : MonoBehaviour
 {
@@ -8,13 +9,24 @@ public class Character : MonoBehaviour
     private Animator animator;
     private Rigidbody rb;
     [SerializeField] private LayerMask ground;
-    [SerializeField] private LayerMask corner;
+    [SerializeField] private LayerMask rightCorner;
+    [SerializeField] private LayerMask leftCorner;
+    [SerializeField] private CinemachineVirtualCamera virtualCamera;
+    [SerializeField] private CinemachineTransposer transposer;
 
     //Movement
     private bool canMove;
     [SerializeField] private float moveSpeed;
     [SerializeField] private Transform groundCheck;
     [SerializeField] private float groundCheckDist;
+    [SerializeField] private int currentLane = 1;
+    [SerializeField] private int targetLane = 1;
+    [SerializeField] private float laneDistance = 1.25f;
+    [SerializeField] private float laneChangeSpeed;
+    [SerializeField] private bool isChangingLane;
+
+    
+
 
 
     void Start()
@@ -23,19 +35,171 @@ public class Character : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         transform.rotation = Quaternion.Euler(0, 180, 0);
         canMove = false;
+        virtualCamera = FindObjectOfType<CinemachineVirtualCamera>();
+        transposer = virtualCamera.GetCinemachineComponent<CinemachineTransposer>();
+        transposer.m_BindingMode = CinemachineTransposer.BindingMode.WorldSpace; // Set binding mode to World Space
     }
 
 
     void Update()
     {
-        if (canMove && (IsOnGrounded() || IsOnCorner()))
-            rb.velocity = new Vector3(transform.forward.x * moveSpeed, rb.velocity.y, transform.forward.z * moveSpeed);
+        InputLogic();
+    }
+
+    private void FixedUpdate()
+    {
+        if (canMove && (IsOnGround() || IsOnRightCorner() || IsOnLeftCorner()))
+            rb.velocity = transform.forward * moveSpeed;
+    }
+
+    private void InputLogic()
+    {
+        if (!canMove)
+            return;
+
+        if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+        {
+            if (IsOnGround())
+            {
+                if (currentLane > 1 || isChangingLane)
+                    return;
+
+                StartCoroutine(ChangeLane(1));
+            }
+            else if (IsOnRightCorner())
+            {
+                if(!IsFacingRight())
+                {
+                    StartCoroutine(RotateSmoothlyTowards(true));
+                }
+            }
+
+
+        }
+        else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+        {
+            if (IsOnGround())
+            {
+                if (currentLane < 1 || isChangingLane)
+                    return;
+                StartCoroutine(ChangeLane(-1));
+            }
+            else if(IsOnLeftCorner())
+            {
+                if (!IsFacingLeft())
+                {
+                    StartCoroutine(RotateSmoothlyTowards(false));
+                }
+            }
+        }
 
     }
 
+    private IEnumerator ChangeLane(int _targetLane)
+    {
+        targetLane += _targetLane;
+
+        if (targetLane < 0)
+            targetLane = 0;
+        else if(targetLane > 2)
+            targetLane = 2;
+
+        if (targetLane < currentLane)
+        {
+            isChangingLane = true;
+            currentLane = targetLane;
+            animator.SetBool("ChangeLaneR", isChangingLane);
+            if (!IsFacingRight() && !IsFacingLeft())
+            {
+                Vector3 targetPosition = new Vector3(transform.position.x - laneDistance, transform.position.y, transform.position.z);
+
+                while (Vector3.Distance(new Vector3(targetPosition.x, 0, 0), new Vector3(transform.position.x, 0, 0)) > 0.05f)
+                {
+                    Vector3 newPos = Vector3.MoveTowards(transform.position, new Vector3(targetPosition.x, transform.position.y, transform.position.z), laneChangeSpeed * Time.deltaTime);
+                    transform.position = newPos;
+                    yield return null;
+                }
+                transform.position = new Vector3(targetPosition.x, transform.position.y, transform.position.z);
+            }
+            else if (IsFacingRight())
+            {
+                Vector3 targetPosition = new Vector3(transform.position.x, transform.position.y, transform.position.z + laneDistance);
+
+                while (Vector3.Distance(new Vector3(0, 0, targetPosition.z), new Vector3(0, 0, transform.position.z)) > 0.05f)
+                {
+                    Vector3 newPos = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, transform.position.y, targetPosition.z), laneChangeSpeed * Time.deltaTime);
+                    transform.position = newPos;
+                    yield return null;
+                }
+                transform.position = new Vector3(transform.position.x, transform.position.y, targetPosition.z);
+            }
+            yield return new WaitForSeconds(0.1f);
+            isChangingLane = false;
+            animator.SetBool("ChangeLaneR", isChangingLane);
+            
+        }
+        else if(targetLane > currentLane)
+        {
+            isChangingLane = true;
+            currentLane = targetLane;
+            animator.SetBool("ChangeLaneL", isChangingLane);
+            if (!IsFacingRight() && !IsFacingLeft())
+            {
+                Vector3 targetPosition = new Vector3(transform.position.x + laneDistance, transform.position.y, transform.position.z);
+                while (Vector3.Distance(new Vector3(targetPosition.x, 0, 0), new Vector3(transform.position.x, 0, 0)) > 0.05f)
+                {
+                    Vector3 newPos = Vector3.MoveTowards(transform.position, new Vector3(targetPosition.x, transform.position.y, transform.position.z), laneChangeSpeed * Time.deltaTime);
+                    transform.position = newPos;
+                    yield return null;
+                }
+                transform.position = new Vector3(targetPosition.x, transform.position.y, transform.position.z);
+            }
+            else if (IsFacingLeft())
+            {
+                Vector3 targetPosition = new Vector3(transform.position.x , transform.position.y, transform.position.z - laneDistance);
+                while (Vector3.Distance(new Vector3(0, 0, targetPosition.z), new Vector3(0, 0, transform.position.z)) > 0.05f)
+                {
+                    Vector3 newPos = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, transform.position.y, targetPosition.z), laneChangeSpeed * Time.deltaTime);
+                    transform.position = newPos;
+                    yield return null;
+                }
+                transform.position = new Vector3(transform.position.x, transform.position.y, targetPosition.z);
+
+            }
+            yield return new WaitForSeconds(0.1f);
+            isChangingLane = false;
+            animator.SetBool("ChangeLaneL", isChangingLane);
+            
+        }
+        
+    }
+
+    public IEnumerator RotateSmoothlyTowards(bool turnRight)
+    {
+        Quaternion startRotation = transform.rotation;
+        float angle = turnRight ? 90f : -90f;
+        Quaternion targetRotation = startRotation * Quaternion.Euler(0, angle, 0);
+
+        float rotationSpeed = 360f; // degrees per second
+
+        while (Quaternion.Angle(transform.rotation, targetRotation) > 0.5f)
+        {
+            transform.rotation = Quaternion.RotateTowards(
+                transform.rotation,
+                targetRotation,
+                rotationSpeed * Time.deltaTime
+            );
+            yield return null;
+        }
+
+        transform.rotation = targetRotation;
+    }
+
+
+    // Start Run
     public void StartRunning()
     {
-        if (IsRotationCloseToZero() || !IsOnGrounded())
+        if (IsRotationCloseToZero() || !IsOnGround())
             return;
 
         StartCoroutine(TurnAndRun());
@@ -43,7 +207,7 @@ public class Character : MonoBehaviour
 
     private IEnumerator TurnAndRun()
     {
-        animator.SetBool("Turn", true);
+        animator.SetBool("Turn180", true);
         // Rotate 180 degrees over 0.5 seconds
         Quaternion startRotation = transform.rotation;
         Quaternion endRotation = startRotation * Quaternion.Euler(0, -180, 0);
@@ -58,31 +222,52 @@ public class Character : MonoBehaviour
         }
         transform.rotation = endRotation;
         canMove = true;
+        transposer.m_BindingMode = CinemachineTransposer.BindingMode.LockToTarget;
     }
-
+    
     private bool IsRotationCloseToZero(float threshold = 1f)
     {
         float yRotation = transform.eulerAngles.y;
         // Handles wrap-around (e.g., 359 degrees is close to 0)
         return Mathf.Abs(Mathf.DeltaAngle(yRotation, 0f)) < threshold;
     }
+    //End Run
 
-    private bool IsOnGrounded()
+    // Ground Checks
+    private bool IsOnGround()
     {
         // Check if the character is grounded using a raycast
         return Physics.Raycast(groundCheck.position, Vector3.down, groundCheckDist, ground);
     }
 
-    private bool IsOnCorner()
+    private bool IsOnRightCorner()
     {
         // Check if the character is grounded using a raycast
-        return Physics.Raycast(groundCheck.position, Vector3.down, groundCheckDist, corner);
+        return Physics.Raycast(groundCheck.position, Vector3.down, groundCheckDist, rightCorner);
+    }
+    private bool IsOnLeftCorner()
+    {
+        // Check if the character is grounded using a raycast
+        return Physics.Raycast(groundCheck.position, Vector3.down, groundCheckDist, leftCorner);
     }
 
     private void OnDrawGizmos()
     {
         Gizmos.DrawLine(groundCheck.position, groundCheck.position + Vector3.down * groundCheckDist);
     }
+    // End Ground Checks
+
+    //Facing Direction
+    private bool IsFacingRight()
+    {
+        return Vector3.Dot(transform.forward, Vector3.right) > 0.9f;
+    }
+
+    private bool IsFacingLeft()
+    {
+        return Vector3.Dot(transform.forward, Vector3.left) > 0.9f;
+    }
+    //End Facing Direction
 }
 
 
