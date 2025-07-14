@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.17770427, g: 0.222485, b: 0.30465862, a: 1}
+  m_IndirectSpecularColor: {r: 0.17769688, g: 0.22247386, b: 0.30465057, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2960,8 +2960,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 305176500}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.13575321, y: 0, z: 0, w: 0.9907427}
-  m_LocalPosition: {x: 0, y: 4.455, z: -8.96}
+  m_LocalRotation: {x: 0.16607043, y: 0.000000016967455, z: -0.000000002857472, w: 0.9861139}
+  m_LocalPosition: {x: 0, y: 3.855, z: -4.9400005}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3061,16 +3061,18 @@ MonoBehaviour:
   leftCorner:
     serializedVersion: 2
     m_Bits: 256
+  walls:
+    serializedVersion: 2
+    m_Bits: 512
   virtualCamera: {fileID: 0}
   transposer: {fileID: 0}
   moveSpeed: 5
   groundCheck: {fileID: 535591914}
   groundCheckDist: 1
-  currentLane: 1
-  targetLane: 1
-  laneDistance: 1.25
-  laneChangeSpeed: 5
-  isChangingLane: 0
+  wallCheckDist: 1
+  playerVector: {x: 0, y: 0, z: 0}
+  playerDirection: 0
+  playerNextDirection: 0
 --- !u!136 &307476544
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -3078,7 +3080,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 307476540}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: abeef4d1a4d75d74084f87cf5980f2ad, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -3090,10 +3092,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.22805956
+  m_Radius: 0.5374212
   m_Height: 1.8203268
   m_Direction: 1
-  m_Center: {x: -0.0048506856, y: 0.90350723, z: -0.01317963}
+  m_Center: {x: -0.020361543, y: 0.90350723, z: -0.0131796}
 --- !u!54 &307476545
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3119,7 +3121,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 80
+  m_Constraints: 112
   m_CollisionDetection: 1
 --- !u!1 &309308597
 GameObject:
@@ -3587,8 +3589,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.13575321, y: 0, z: 0, w: 0.9907427}
-  m_LocalPosition: {x: 0, y: 4.455, z: -8.96}
+  m_LocalRotation: {x: 0.16607043, y: 0.000000016967455, z: -0.000000002857472, w: 0.9861139}
+  m_LocalPosition: {x: 0, y: 3.855, z: -4.9400005}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3654,8 +3656,8 @@ MonoBehaviour:
   m_ShowCameraFrustum: 1
   m_IgnoreTimeScale: 0
   m_WorldUpOverride: {fileID: 0}
-  m_UpdateMethod: 1
-  m_BlendUpdateMethod: 1
+  m_UpdateMethod: 0
+  m_BlendUpdateMethod: 0
   m_DefaultBlend:
     m_Style: 1
     m_Time: 2
@@ -5873,7 +5875,7 @@ Transform:
   m_GameObject: {fileID: 535591913}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.076, z: 0}
+  m_LocalPosition: {x: 0, y: 0.801, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -16191,10 +16193,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 4
-  m_FollowOffset: {x: 0, y: 4.5, z: -11.78}
-  m_XDamping: 20
+  m_FollowOffset: {x: 0, y: 3.9, z: -7.76}
+  m_XDamping: 1
   m_YDamping: 1
-  m_ZDamping: 1
+  m_ZDamping: 3
   m_AngularDampingMode: 0
   m_PitchDamping: 0
   m_YawDamping: 0

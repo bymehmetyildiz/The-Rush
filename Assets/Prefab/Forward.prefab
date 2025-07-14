@@ -152,7 +152,7 @@ GameObject:
   - component: {fileID: 1715403728922798289}
   - component: {fileID: 7942459314961120780}
   - component: {fileID: 1882520002397469186}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: DungeonWall2 (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -231,7 +231,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2739822754408000337}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: abeef4d1a4d75d74084f87cf5980f2ad, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -362,7 +362,7 @@ GameObject:
   - component: {fileID: 4922531788351693519}
   - component: {fileID: 5398779331828578476}
   - component: {fileID: 40123426023069135}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: DungeonWall2 (5)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -441,7 +441,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2875432769926583186}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: abeef4d1a4d75d74084f87cf5980f2ad, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -572,7 +572,7 @@ GameObject:
   - component: {fileID: 4799914163342911977}
   - component: {fileID: 3439816474898225361}
   - component: {fileID: 4730930471435532558}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: DungeonWall2 (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -651,7 +651,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3565446084725980708}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: abeef4d1a4d75d74084f87cf5980f2ad, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -677,7 +677,7 @@ GameObject:
   - component: {fileID: 3019952534445132258}
   - component: {fileID: 4638815576860572644}
   - component: {fileID: 7812851709008751818}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: DungeonWall2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -756,7 +756,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3595614661619613843}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: abeef4d1a4d75d74084f87cf5980f2ad, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -861,7 +861,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3714188025252766993}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: abeef4d1a4d75d74084f87cf5980f2ad, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -1242,7 +1242,7 @@ GameObject:
   - component: {fileID: 2938648279052905275}
   - component: {fileID: 6631211150728079246}
   - component: {fileID: 326642097720184792}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: DungeonWall2 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1321,7 +1321,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7924007476014526737}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: abeef4d1a4d75d74084f87cf5980f2ad, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -1426,7 +1426,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8393815239023788786}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: abeef4d1a4d75d74084f87cf5980f2ad, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -1592,7 +1592,7 @@ GameObject:
   - component: {fileID: 69394149445515048}
   - component: {fileID: 3835370400889787990}
   - component: {fileID: 2565793129683549677}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: DungeonWall2 (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1671,7 +1671,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9056604293576055737}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: abeef4d1a4d75d74084f87cf5980f2ad, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
