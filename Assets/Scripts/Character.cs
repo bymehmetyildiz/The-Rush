@@ -10,6 +10,7 @@ public class Character : MonoBehaviour
     //Referances
     private Animator animator;
     private Rigidbody rb;
+    private CapsuleCollider cc;
     [SerializeField] private LayerMask ground;
     [SerializeField] private LayerMask rightCorner;
     [SerializeField] private LayerMask leftCorner;   
@@ -35,6 +36,12 @@ public class Character : MonoBehaviour
     [SerializeField] private bool isJumping;    
     [SerializeField] private float jumpForce = 5f; // Adjust as needed
 
+    //Crouching
+    [SerializeField] private bool isCrouching;
+    [SerializeField] private float crouchTimer;
+    [SerializeField] private float crouchDur;
+    
+
 
     void Start()
     {        
@@ -46,7 +53,7 @@ public class Character : MonoBehaviour
         transposer = virtualCamera.GetCinemachineComponent<CinemachineTransposer>();
         transposer.m_BindingMode = CinemachineTransposer.BindingMode.WorldSpace; // Set binding mode to World Space
         playerVector = new Vector3(0, 0, 1) * moveSpeed * Time.deltaTime;
-        
+        cc = GetComponent<CapsuleCollider>();
     }
 
 
@@ -120,8 +127,9 @@ public class Character : MonoBehaviour
     private void PlayerInputLogic()
     {
         isGrounded = IsOnGround() ||IsOnLeftCorner() || IsOnRightCorner();
+        crouchTimer += Time.deltaTime;
 
-        if ((Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) && IsOnRightCorner())
+        if ((Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) && IsOnRightCorner() && !isCrouching)
         {
             switch (playerDirection)
             {
@@ -138,7 +146,7 @@ public class Character : MonoBehaviour
             playerDirection = playerNextDirection;
         }
 
-        if ((Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) && IsOnLeftCorner())
+        if ((Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) && IsOnLeftCorner() && !isCrouching)
         {
             switch (playerDirection)
             {
@@ -155,14 +163,40 @@ public class Character : MonoBehaviour
             playerDirection = playerNextDirection;
         }
 
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded && !isJumping)
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded && !isJumping && canMove && !isCrouching)
         {
             animator.SetTrigger("Jump");
         }
 
-        
+        if(Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
+        {                            
+            if (canMove && isGrounded && !isJumping && !isCrouching)
+            {
+                crouchTimer = 0f;
+                isCrouching = true;
+                animator.SetBool("Crouch", true);
+                cc.center = Vector3.MoveTowards(cc.center, new Vector3(0, 0.45f, 0), 2f);
+                cc.height = Mathf.MoveTowards(cc.height, 0.9f, 2f);
+
+                
+            }
+        }
+        else if (crouchTimer > crouchDur)
+                Rise();
     }
 
+    public void Rise()
+    {
+        Debug.Log("Rise");
+        isCrouching = false;        
+        animator.SetBool("Crouch", false);
+        cc.center = new Vector3(0, 0.9f, 0);
+        cc.height = 1.8f;        
+    }
+
+
+
+    // Jumping
     public void Jump()
     {
         rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
@@ -188,7 +222,7 @@ public class Character : MonoBehaviour
         animator.SetTrigger("Land");
     }
 
-
+    //Rotation
     public IEnumerator RotateSmoothlyTowards(bool turnRight)
     {
         Quaternion startRotation = transform.rotation;
@@ -277,17 +311,6 @@ public class Character : MonoBehaviour
     }
     // End Ground Checks
 
-    //Facing Direction
-    private bool IsFacingRight()
-    {
-        return Vector3.Dot(transform.forward, Vector3.right) > 0.9f;
-    }
-
-    private bool IsFacingLeft()
-    {
-        return Vector3.Dot(transform.forward, Vector3.left) > 0.9f;
-    }
-    //End Facing Direction
 }
 
 
