@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.17769688, g: 0.22247386, b: 0.30465057, a: 1}
+  m_IndirectSpecularColor: {r: 0.17770427, g: 0.222485, b: 0.30465862, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -3073,6 +3073,9 @@ MonoBehaviour:
   playerVector: {x: 0, y: 0, z: 0}
   playerDirection: 0
   playerNextDirection: 0
+  isGrounded: 0
+  isJumping: 0
+  jumpForce: 5
 --- !u!136 &307476544
 CapsuleCollider:
   m_ObjectHideFlags: 0

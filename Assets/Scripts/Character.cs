@@ -30,6 +30,11 @@ public class Character : MonoBehaviour
     [SerializeField] Direction playerDirection = Direction.Forward;
     [SerializeField] Direction playerNextDirection = Direction.Forward;
 
+    //Jumping
+    [SerializeField] private bool isGrounded;    
+    [SerializeField] private bool isJumping;    
+    [SerializeField] private float jumpForce = 5f; // Adjust as needed
+
 
     void Start()
     {        
@@ -101,16 +106,21 @@ public class Character : MonoBehaviour
         }
         else if (!IsOnGround())
             animator.SetBool("Strafe", false);
+      
 
-        if (canMove && (IsOnGround() || IsOnRightCorner() || IsOnLeftCorner()))
+        if (canMove && (IsOnGround() || IsOnRightCorner() || IsOnLeftCorner()) && !isJumping)        
             rb.velocity = playerVector;
-
-
+            
+        
+       
     }
+
 
     //PlayerInputLogic
     private void PlayerInputLogic()
     {
+        isGrounded = IsOnGround() ||IsOnLeftCorner() || IsOnRightCorner();
+
         if ((Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) && IsOnRightCorner())
         {
             switch (playerDirection)
@@ -144,151 +154,41 @@ public class Character : MonoBehaviour
             }
             playerDirection = playerNextDirection;
         }
-    }
-    public IEnumerator RotateSmoothlyTowards(bool turnRight)
-    {
-        Quaternion startRotation = transform.rotation;
-        float angle = turnRight ? 90f : -90f;
-        Quaternion targetRotation = startRotation * Quaternion.Euler(0, angle, 0);
 
-        float rotationSpeed = 360f; // degrees per second
-
-        while (Quaternion.Angle(transform.rotation, targetRotation) > 0.5f)
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded && !isJumping)
         {
-            transform.rotation = Quaternion.RotateTowards(
-                transform.rotation,
-                targetRotation,
-                rotationSpeed * Time.deltaTime
-            );
-            yield return null;
+            animator.SetTrigger("Jump");
         }
 
-        transform.rotation = targetRotation;
-    }
-
-    /*
-    private void InputLogic()
-    {
-        if (!canMove)
-            return;
-
-        if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
-        {
-            if (IsOnGround())
-            {
-                if (currentLane > 1 || isChangingLane)
-                    return;
-
-                StartCoroutine(ChangeLane(1));
-            }
-            else if (IsOnRightCorner())
-            {
-                if(!IsFacingRight())
-                {
-                    StartCoroutine(RotateSmoothlyTowards(true));
-                }
-            }
-
-
-        }
-        else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
-        {
-            if (IsOnGround())
-            {
-                if (currentLane < 1 || isChangingLane)
-                    return;
-                StartCoroutine(ChangeLane(-1));
-            }
-            else if(IsOnLeftCorner())
-            {
-                if (!IsFacingLeft())
-                {
-                    StartCoroutine(RotateSmoothlyTowards(false));
-                }
-            }
-        }
-
-    }
-
-    private IEnumerator ChangeLane(int _targetLane)
-    {
-        targetLane += _targetLane;
-
-        if (targetLane < 0)
-            targetLane = 0;
-        else if(targetLane > 2)
-            targetLane = 2;
-
-        if (targetLane < currentLane)
-        {
-            isChangingLane = true;
-            currentLane = targetLane;
-            animator.SetBool("ChangeLaneR", isChangingLane);
-            if (!IsFacingRight() && !IsFacingLeft())
-            {
-                Vector3 targetPosition = new Vector3(transform.position.x - laneDistance, transform.position.y, transform.position.z);
-
-                while (Vector3.Distance(new Vector3(targetPosition.x, 0, 0), new Vector3(transform.position.x, 0, 0)) > 0.05f)
-                {
-                    Vector3 newPos = Vector3.MoveTowards(transform.position, new Vector3(targetPosition.x, transform.position.y, transform.position.z), laneChangeSpeed * Time.deltaTime);
-                    transform.position = newPos;
-                    yield return null;
-                }
-                transform.position = new Vector3(targetPosition.x, transform.position.y, transform.position.z);
-            }
-            else if (IsFacingRight())
-            {
-                Vector3 targetPosition = new Vector3(transform.position.x, transform.position.y, transform.position.z + laneDistance);
-
-                while (Vector3.Distance(new Vector3(0, 0, transform.position.z), new Vector3(0, 0, targetPosition.z)) > 0.05f)
-                {
-                    Vector3 newPos = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, transform.position.y, targetPosition.z), laneChangeSpeed * Time.deltaTime);
-                    transform.position = newPos;
-                    yield return null;
-                }
-                transform.position = new Vector3(transform.position.x, transform.position.y, targetPosition.z);
-            }
-            yield return new WaitForSeconds(0.1f);
-            isChangingLane = false;
-            animator.SetBool("ChangeLaneR", isChangingLane);
-            
-        }
-        else if(targetLane > currentLane)
-        {
-            isChangingLane = true;
-            currentLane = targetLane;
-            animator.SetBool("ChangeLaneL", isChangingLane);
-            if (!IsFacingRight() && !IsFacingLeft())
-            {
-                Vector3 targetPosition = new Vector3(transform.position.x + laneDistance, transform.position.y, transform.position.z);
-                while (Vector3.Distance(new Vector3(targetPosition.x, 0, 0), new Vector3(transform.position.x, 0, 0)) > 0.05f)
-                {
-                    Vector3 newPos = Vector3.MoveTowards(transform.position, new Vector3(targetPosition.x, transform.position.y, transform.position.z), laneChangeSpeed * Time.deltaTime);
-                    transform.position = newPos;
-                    yield return null;
-                }
-                transform.position = new Vector3(targetPosition.x, transform.position.y, transform.position.z);
-            }
-            else if (IsFacingLeft())
-            {
-                Vector3 targetPosition = new Vector3(transform.position.x , transform.position.y, transform.position.z - laneDistance);
-                while (Vector3.Distance(new Vector3(0, 0, targetPosition.z), new Vector3(0, 0, transform.position.z)) > 0.05f)
-                {
-                    Vector3 newPos = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, transform.position.y, targetPosition.z), laneChangeSpeed * Time.deltaTime);
-                    transform.position = newPos;
-                    yield return null;
-                }
-                transform.position = new Vector3(transform.position.x, transform.position.y, targetPosition.z);
-
-            }
-            yield return new WaitForSeconds(0.1f);
-            isChangingLane = false;
-            animator.SetBool("ChangeLaneL", isChangingLane);
-            
-        }
         
     }
 
+    public void Jump()
+    {
+        rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        isJumping = true;
+        StartCoroutine(Land());
+    }
+
+    private IEnumerator Land()
+    {
+        // Wait until the character leaves the ground
+        while (IsOnGround() || IsOnLeftCorner() || IsOnRightCorner())
+        {
+            yield return null;
+        }
+
+        // Now wait until character returns to ground
+        while (!(IsOnGround() || IsOnLeftCorner() || IsOnRightCorner()))
+        {
+            yield return null;
+        }
+
+        isJumping = false;
+        animator.SetTrigger("Land");
+    }
+
+
     public IEnumerator RotateSmoothlyTowards(bool turnRight)
     {
         Quaternion startRotation = transform.rotation;
@@ -309,7 +209,6 @@ public class Character : MonoBehaviour
 
         transform.rotation = targetRotation;
     }
-    */
 
     // Start Run
     public void StartRunning()
@@ -322,22 +221,25 @@ public class Character : MonoBehaviour
 
     private IEnumerator TurnAndRun()
     {
-        animator.SetBool("Turn180", true);
-        // Rotate 180 degrees over 0.5 seconds
-        Quaternion startRotation = transform.rotation;
-        Quaternion endRotation = startRotation * Quaternion.Euler(0, -180, 0);
-        float duration = 0.5f;
-        float elapsed = 0f;
-
-        while (elapsed < duration)
+        if (!canMove)
         {
-            transform.rotation = Quaternion.Slerp(startRotation, endRotation, elapsed / duration);
-            elapsed += Time.deltaTime;
-            yield return null;
+            animator.SetBool("Turn180", true);
+            // Rotate 180 degrees over 0.5 seconds
+            Quaternion startRotation = transform.rotation;
+            Quaternion endRotation = startRotation * Quaternion.Euler(0, -180, 0);
+            float duration = 0.5f;
+            float elapsed = 0f;
+
+            while (elapsed < duration)
+            {
+                transform.rotation = Quaternion.Slerp(startRotation, endRotation, elapsed / duration);
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+            transform.rotation = endRotation;
+            canMove = true;
+            transposer.m_BindingMode = CinemachineTransposer.BindingMode.LockToTarget;
         }
-        transform.rotation = endRotation;
-        canMove = true;
-        transposer.m_BindingMode = CinemachineTransposer.BindingMode.LockToTarget;
     }
     
     private bool IsRotationCloseToZero(float threshold = 1f)
