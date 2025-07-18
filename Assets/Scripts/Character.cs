@@ -13,17 +13,18 @@ public class Character : MonoBehaviour
     private CapsuleCollider cc;
     [SerializeField] private LayerMask ground;
     [SerializeField] private LayerMask rightCorner;
-    [SerializeField] private LayerMask leftCorner;   
-    [SerializeField] private LayerMask walls;   
+    [SerializeField] private LayerMask leftCorner;
+    [SerializeField] private LayerMask walls;
     [SerializeField] private CinemachineVirtualCamera virtualCamera;
     [SerializeField] private CinemachineTransposer transposer;
 
     //Movement
     private bool canMove;
+    private bool isTurning; 
     [SerializeField] private float moveSpeed;
     [SerializeField] private Transform groundCheck;
-    [SerializeField] private float groundCheckDist;    
-    [SerializeField] private float wallCheckDist;    
+    [SerializeField] private float groundCheckDist;
+    [SerializeField] private float wallCheckDist;
     [SerializeField] private Vector3 playerVector;
 
 
@@ -32,19 +33,20 @@ public class Character : MonoBehaviour
     [SerializeField] Direction playerNextDirection = Direction.Forward;
 
     //Jumping
-    [SerializeField] private bool isGrounded;    
-    [SerializeField] private bool isJumping;    
+    [SerializeField] private bool isGrounded;
+    [SerializeField] private bool isJumping;
     [SerializeField] private float jumpForce = 5f; // Adjust as needed
 
     //Crouching
-    [SerializeField] private bool isCrouching;
+    [SerializeField] private bool isRolling;
     [SerializeField] private float crouchTimer;
     [SerializeField] private float crouchDur;
-    
 
+    //Collision
+    private bool isHit;
 
     void Start()
-    {        
+    {
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         transform.rotation = Quaternion.Euler(0, 180, 0);
@@ -54,6 +56,7 @@ public class Character : MonoBehaviour
         transposer.m_BindingMode = CinemachineTransposer.BindingMode.WorldSpace; // Set binding mode to World Space
         playerVector = new Vector3(0, 0, 1) * moveSpeed * Time.deltaTime;
         cc = GetComponent<CapsuleCollider>();
+        isHit = false;
     }
 
 
@@ -71,6 +74,10 @@ public class Character : MonoBehaviour
     //Movement
     private void MovementLogic()
     {
+        if (isHit)
+            return;
+
+
         if (playerDirection == Direction.Forward)
         {
             playerVector = Vector3.forward * moveSpeed;
@@ -113,23 +120,27 @@ public class Character : MonoBehaviour
         }
         else if (!IsOnGround())
             animator.SetBool("Strafe", false);
-      
 
-        if (canMove && (IsOnGround() || IsOnRightCorner() || IsOnLeftCorner()) && !isJumping)        
+
+        if (canMove && (IsOnGround() || IsOnRightCorner() || IsOnLeftCorner()) && !isJumping)
             rb.velocity = playerVector;
-            
-        
-       
+
+
+
     }
 
 
     //PlayerInputLogic
     private void PlayerInputLogic()
     {
-        isGrounded = IsOnGround() ||IsOnLeftCorner() || IsOnRightCorner();
+        isGrounded = IsOnGround() || IsOnLeftCorner() || IsOnRightCorner();
+
+        if (isHit)
+            return;
+
         crouchTimer += Time.deltaTime;
 
-        if ((Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) && IsOnRightCorner() && !isCrouching)
+        if ((Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) && IsOnRightCorner() && !isRolling)
         {
             switch (playerDirection)
             {
@@ -146,7 +157,7 @@ public class Character : MonoBehaviour
             playerDirection = playerNextDirection;
         }
 
-        if ((Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) && IsOnLeftCorner() && !isCrouching)
+        if ((Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) && IsOnLeftCorner() && !isRolling)
         {
             switch (playerDirection)
             {
@@ -163,35 +174,34 @@ public class Character : MonoBehaviour
             playerDirection = playerNextDirection;
         }
 
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded && !isJumping && canMove && !isCrouching)
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded && !isJumping && canMove && !isRolling)
         {
             animator.SetTrigger("Jump");
         }
 
-        if(Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
-        {                            
-            if (canMove && isGrounded && !isJumping && !isCrouching)
+        if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            if (canMove && isGrounded && !isJumping && !isRolling)
             {
                 crouchTimer = 0f;
-                isCrouching = true;
+                isRolling = true;
                 animator.SetBool("Crouch", true);
                 cc.center = Vector3.MoveTowards(cc.center, new Vector3(0, 0.45f, 0), 2f);
                 cc.height = Mathf.MoveTowards(cc.height, 0.9f, 2f);
 
-                
+
             }
         }
         else if (crouchTimer > crouchDur)
-                Rise();
+            Rise();
     }
 
     public void Rise()
     {
-        Debug.Log("Rise");
-        isCrouching = false;        
+        isRolling = false;
         animator.SetBool("Crouch", false);
         cc.center = new Vector3(0, 0.9f, 0);
-        cc.height = 1.8f;        
+        cc.height = 1.8f;
     }
 
 
@@ -255,8 +265,9 @@ public class Character : MonoBehaviour
 
     private IEnumerator TurnAndRun()
     {
-        if (!canMove)
+        if (!canMove && !isTurning)
         {
+            isTurning = true;
             animator.SetBool("Turn180", true);
             // Rotate 180 degrees over 0.5 seconds
             Quaternion startRotation = transform.rotation;
@@ -273,9 +284,36 @@ public class Character : MonoBehaviour
             transform.rotation = endRotation;
             canMove = true;
             transposer.m_BindingMode = CinemachineTransposer.BindingMode.LockToTarget;
+            isTurning = false;
         }
     }
-    
+
+    private IEnumerator GetAngryAfterHit(float seconds)
+    {
+        if (isHit)
+        {
+            animator.SetBool("Hit", true);
+            transposer.m_BindingMode = CinemachineTransposer.BindingMode.WorldSpace;
+            yield return new WaitForSeconds(seconds);
+            animator.SetBool("Hit", false);
+            animator.SetBool("Turn180", true);
+            // Rotate 180 degrees over 0.5 seconds
+            Quaternion startRotation = transform.rotation;
+            Quaternion endRotation = startRotation * Quaternion.Euler(0, -180, 0);
+            float duration = 0.5f;
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                transform.rotation = Quaternion.Slerp(startRotation, endRotation, elapsed / duration);
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+            transform.rotation = endRotation;
+            animator.SetBool("Angry", true);
+            isHit = false;
+        }
+    }
+
     private bool IsRotationCloseToZero(float threshold = 1f)
     {
         float yRotation = transform.eulerAngles.y;
@@ -303,13 +341,23 @@ public class Character : MonoBehaviour
     }
 
     // Wall Detection Method
-   
+
 
     private void OnDrawGizmos()
     {
-        Gizmos.DrawLine(groundCheck.position, groundCheck.position + Vector3.down * groundCheckDist);   
+        Gizmos.DrawLine(groundCheck.position, groundCheck.position + Vector3.down * groundCheckDist);
     }
     // End Ground Checks
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Obstacle"))
+        {
+            canMove = false;
+            isHit = true;
+            StartCoroutine(GetAngryAfterHit(2.75f));
+        }
+    }
 
 }
 
