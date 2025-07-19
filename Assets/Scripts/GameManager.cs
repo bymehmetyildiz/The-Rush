@@ -6,28 +6,43 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] private GameObject[] blocks;
     [SerializeField] private GameObject currentBlock;
-    [SerializeField] private GameObject previousBlock;
-    [SerializeField] private GameObject nextBlock;
+    [SerializeField] private GameObject firstBlock;
+    [SerializeField] private GameObject secondBlock;
+    [SerializeField] private GameObject thirdBlock;
+    [SerializeField] private GameObject fourthBlock;
     [SerializeField] private Character character;
+    
 
 
     void Start()
     {
         character = FindObjectOfType<Character>();
-        previousBlock = Instantiate(blocks[0], new Vector3(0, 0, 0), Quaternion.identity);
-        currentBlock = Instantiate(blocks[0], new Vector3(0, 0, 0 + 12), Quaternion.identity);
-        nextBlock = Instantiate(blocks[0], new Vector3(0, 0, 0 + 24), Quaternion.identity);
+        firstBlock = Instantiate(blocks[0], new Vector3(0, 0, 0), Quaternion.identity);
+        secondBlock = Instantiate(blocks[0], new Vector3(0, 0, 0 + 12), Quaternion.identity);
+        thirdBlock = Instantiate(blocks[0], new Vector3(0, 0, 0 + 24), Quaternion.identity);
+        fourthBlock = Instantiate(blocks[Random.Range(0, 19)], new Vector3(0, 0, 0 + 36), Quaternion.identity);
+        currentBlock = secondBlock;
     }
 
-    
+
     void Update()
     {
-        if(character.transform.position.z > currentBlock.transform.position.z)
-        {
-            Destroy(previousBlock, 2);
-            previousBlock = currentBlock;
-            currentBlock = nextBlock;
-            nextBlock = Instantiate(blocks[Random.Range(0, blocks.Length)], new Vector3(0, 0, currentBlock.transform.position.z + 12), Quaternion.identity);
+       if(character.transform.position.z > fourthBlock.transform.position.z - 10)
+       {
+           if(character.transform.position.z > currentBlock.transform.position.z)
+           {
+              
+                firstBlock = secondBlock;
+               secondBlock = thirdBlock;
+               thirdBlock = fourthBlock;
+               fourthBlock = Instantiate(blocks[Random.Range(0, 19)], new Vector3(0, 0, fourthBlock.transform.position.z + 12), Quaternion.identity);
+            }
         }
+
     }
+
+   
+
+   
+
 }

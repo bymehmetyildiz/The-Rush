@@ -12660,9 +12660,13 @@ MonoBehaviour:
   - {fileID: 8144794811185384221, guid: 1e18e082f4a69534b9bda176b45fedf3, type: 3}
   - {fileID: 7979331655134518782, guid: 058011cd2a7ef8448b3d4773a41424ee, type: 3}
   - {fileID: 8800116264739952465, guid: 1c567fae02855884a9693ccb91f1b3af, type: 3}
+  - {fileID: 9154896356791095023, guid: 3b46db74b8630fd4d9f3dd8b5cba114a, type: 3}
+  - {fileID: 4073470748869265786, guid: 9680edd496fce1b48ac72b328115c4ec, type: 3}
   currentBlock: {fileID: 0}
-  previousBlock: {fileID: 0}
-  nextBlock: {fileID: 0}
+  firstBlock: {fileID: 0}
+  secondBlock: {fileID: 0}
+  thirdBlock: {fileID: 0}
+  fourthBlock: {fileID: 0}
   character: {fileID: 0}
 --- !u!4 &1047530925
 Transform:

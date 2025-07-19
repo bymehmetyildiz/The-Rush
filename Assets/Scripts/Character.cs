@@ -5,7 +5,7 @@ using Cinemachine;
 
 public class Character : MonoBehaviour
 {
-    enum Direction { Forward, Right, Left }
+    public enum Direction { Forward, Right, Left }
 
     //Referances
     private Animator animator;
@@ -29,7 +29,7 @@ public class Character : MonoBehaviour
 
 
     //Rotation
-    [SerializeField] Direction playerDirection = Direction.Forward;
+    public Direction playerDirection = Direction.Forward;
     [SerializeField] Direction playerNextDirection = Direction.Forward;
 
     //Jumping

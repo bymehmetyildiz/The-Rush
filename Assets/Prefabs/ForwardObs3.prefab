@@ -847,6 +847,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7759697689081955392}
+  - component: {fileID: 2493849619282765949}
   m_Layer: 0
   m_Name: ForwardObs3
   m_TagString: Untagged
@@ -873,6 +874,19 @@ Transform:
   - {fileID: 1976907222984028940}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2493849619282765949
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6628804263426844140}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6b7f536f73dea2429bef59d43c79387, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  blockType: 0
 --- !u!1 &7343270921194416970
 GameObject:
   m_ObjectHideFlags: 0
