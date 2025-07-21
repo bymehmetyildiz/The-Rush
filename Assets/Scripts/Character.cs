@@ -11,6 +11,7 @@ public class Character : MonoBehaviour
     private Animator animator;
     private Rigidbody rb;
     private CapsuleCollider cc;
+    private UIController uiController;
     [SerializeField] private LayerMask ground;
     [SerializeField] private LayerMask rightCorner;
     [SerializeField] private LayerMask leftCorner;
@@ -49,6 +50,7 @@ public class Character : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
+        uiController = FindObjectOfType<UIController>();
         transform.rotation = Quaternion.Euler(0, 180, 0);
         canMove = false;
         virtualCamera = FindObjectOfType<CinemachineVirtualCamera>();
@@ -358,6 +360,16 @@ public class Character : MonoBehaviour
             StartCoroutine(GetAngryAfterHit(2.75f));
         }
     }
+
+    // Score Counter
+    public void ScoreCounter()
+    {
+        uiController.score++;
+        uiController.scoreText.text = uiController.score.ToString() + " m";
+    }
+
+
+
 
 }
 

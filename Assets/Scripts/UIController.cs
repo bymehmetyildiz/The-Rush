@@ -1,18 +1,36 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class UIController : MonoBehaviour
 {
-    // Start is called before the first frame update
+    [SerializeField] private GameObject startButton;
+    [SerializeField] private GameObject pauseButton;
+    public TMP_Text scoreText;
+    public int score;
+
     void Start()
     {
-        
+        pauseButton.SetActive(false);
+        score = 0;
+        scoreText.text = score.ToString() + " m";
     }
 
-    // Update is called once per frame
+    
     void Update()
     {
         
     }
+
+    public void StartGame()
+    {
+        if (startButton.activeSelf == true)
+        {
+            startButton.SetActive(false);
+            pauseButton.SetActive(true);
+        }        
+    }
+
+
 }
