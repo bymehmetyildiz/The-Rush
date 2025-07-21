@@ -19,7 +19,7 @@ public class Character : MonoBehaviour
     [SerializeField] private CinemachineTransposer transposer;
 
     //Movement
-    private bool canMove;
+    public bool canMove;
     private bool isTurning; 
     [SerializeField] private float moveSpeed;
     [SerializeField] private Transform groundCheck;
@@ -53,7 +53,7 @@ public class Character : MonoBehaviour
         canMove = false;
         virtualCamera = FindObjectOfType<CinemachineVirtualCamera>();
         transposer = virtualCamera.GetCinemachineComponent<CinemachineTransposer>();
-        transposer.m_BindingMode = CinemachineTransposer.BindingMode.WorldSpace; // Set binding mode to World Space
+        transposer.m_BindingMode = CinemachineTransposer.BindingMode.SimpleFollowWithWorldUp; // Set binding mode to World Space
         playerVector = new Vector3(0, 0, 1) * moveSpeed * Time.deltaTime;
         cc = GetComponent<CapsuleCollider>();
         isHit = false;
@@ -293,7 +293,7 @@ public class Character : MonoBehaviour
         if (isHit)
         {
             animator.SetBool("Hit", true);
-            transposer.m_BindingMode = CinemachineTransposer.BindingMode.WorldSpace;
+            transposer.m_BindingMode = CinemachineTransposer.BindingMode.SimpleFollowWithWorldUp;
             yield return new WaitForSeconds(seconds);
             animator.SetBool("Hit", false);
             animator.SetBool("Turn180", true);
