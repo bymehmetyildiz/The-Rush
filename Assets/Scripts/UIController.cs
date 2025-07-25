@@ -29,6 +29,13 @@ public class UIController : MonoBehaviour
     [SerializeField] private Vector2 coinSpawnPoint;
     [SerializeField] private GameObject coinEndPoint;
 
+    //Customize Panel
+    [SerializeField] private RectTransform[] categories;
+    [SerializeField] private RectTransform current;
+    [SerializeField] private TMP_Text headerText;
+    private int currentIndex = 0;
+    private bool isSnapping;
+    
 
     private void Awake()
     {
@@ -49,6 +56,14 @@ public class UIController : MonoBehaviour
         canSpawnCoin = false;
 
         coinText.text = coinAmount.ToString();
+
+        for (int i = 0; i < categories.Length; i++)
+        {
+            categories[i].anchoredPosition = new Vector2(600, 445);
+        }
+        categories[0].anchoredPosition = new Vector2(0, 445);
+        current = categories[0];
+        headerText.text = categories[0].gameObject.name;
     }
 
     
@@ -103,6 +118,54 @@ public class UIController : MonoBehaviour
         coinAmount++;
         coinText.text = coinAmount.ToString();        
         Destroy(newCoin);
+    }
+
+    public void SlidePanels(bool toRight)
+    {
+        if(toRight)
+        {
+            if (currentIndex < categories.Length - 1 && !isSnapping)
+            {
+                isSnapping = true;
+                categories[currentIndex].DOAnchorPos(new Vector2(-600, 445), 0.25f);
+                currentIndex++;
+                headerText.text = categories[currentIndex].gameObject.name;
+                categories[currentIndex]
+                    .DOAnchorPos(new Vector2(0, 445), 0.5f)
+                    .SetEase(Ease.OutBack)
+                    .OnComplete(() =>
+                    {
+                        current = categories[currentIndex];
+                        isSnapping = false;
+                    });
+                
+            }
+            else
+                return;
+
+            
+        }
+        else
+        {
+            if (currentIndex > 0 && !isSnapping)
+            {
+                isSnapping = true;
+                categories[currentIndex].DOAnchorPos(new Vector2(600, 445), 0.25f);
+                currentIndex--;
+                headerText.text = categories[currentIndex].gameObject.name;
+                categories[currentIndex]
+                    .DOAnchorPos(new Vector2(0, 445), 0.5f)
+                    .SetEase(Ease.OutBack)
+                    .OnComplete(() =>
+                    {
+                        current = categories[currentIndex];
+                        isSnapping = false;
+                    });
+                
+            }
+            else
+                return;
+        }
     }
 
 }
