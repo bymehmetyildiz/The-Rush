@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,22 +10,29 @@ public class Customizable : MonoBehaviour
 
     void Start()
     {
+
         for (int i = 0; i < transform.childCount; i++)
         {
             GameObject child = transform.GetChild(i).gameObject;
             childs.Add(child);
             child.SetActive(false); // Deactivate all children initially
         }
-
         if (!isOptional)
         {
             childs[0].SetActive(true);
         }
-    }
-
-    
-    void Update()
-    {
         
     }
+
+    public void Activate(int index)
+    {
+        for (int i = 0; i < childs.Count; i++)
+        {
+            childs[i].SetActive(false); // Deactivate all children
+        }
+
+        childs[index].SetActive(true); // Activate the specified child
+    }
+
+   
 }
