@@ -35,7 +35,10 @@ public class UIController : MonoBehaviour
     [SerializeField] private TMP_Text headerText;
     private int currentIndex = 0;
     private bool isSnapping;
-    
+    [SerializeField] private List<UI_SlotManager> slots;
+    private UI_SlotManager currentSlot;
+    [SerializeField] private RectTransform frame;    
+
 
     private void Awake()
     {
@@ -55,7 +58,8 @@ public class UIController : MonoBehaviour
         character = FindObjectOfType<Character>();   
         canSpawnCoin = false;
 
-        coinText.text = coinAmount.ToString();
+        coinAmount = 10000000;
+        coinText.text = FormatNumber(coinAmount);
 
         for (int i = 0; i < categories.Length; i++)
         {
@@ -63,9 +67,10 @@ public class UIController : MonoBehaviour
         }
         categories[0].anchoredPosition = new Vector2(0, 445);
         current = categories[0];
-        headerText.text = categories[0].gameObject.name;
-    }
+        headerText.text = categories[0].gameObject.name;   
 
+        frame.gameObject.SetActive(false);
+    }
     
     void Update()
     {
@@ -168,4 +173,19 @@ public class UIController : MonoBehaviour
         }
     }
 
+    string FormatNumber(long number)
+    {
+        if (number >= 1_000_000_000_000_000)
+            return (number / 1_000_000_000_000_000f).ToString("0.#") + "Q";
+        else if (number >= 1_000_000_000_000)
+            return (number / 1_000_000_000_000f).ToString("0.#") + "T";
+        else if (number >= 1_000_000_000)
+            return (number / 1_000_000_000f).ToString("0.#") + "B";
+        else if (number >= 1_000_000)
+            return (number / 1_000_000f).ToString("0.#") + "M";
+        else if (number >= 1_000)
+            return (number / 1_000f).ToString("0.#") + "K";
+        else
+            return number.ToString();
+    }
 }

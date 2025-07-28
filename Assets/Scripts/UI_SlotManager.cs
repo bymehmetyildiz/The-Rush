@@ -6,6 +6,7 @@ using TMPro;
 
 public class UI_SlotManager : MonoBehaviour
 {
+    public CustomizableType customizableType;
     [SerializeField] private bool isUnlocked;
     [SerializeField] private Image lockImage;
     [SerializeField] private int cost;
@@ -13,7 +14,6 @@ public class UI_SlotManager : MonoBehaviour
 
     [SerializeField] private Customizable relational;
     [SerializeField] private int index;
-
 
     void Start()
     {
@@ -32,18 +32,18 @@ public class UI_SlotManager : MonoBehaviour
     public void UnlockSlot()
     {
         if (isUnlocked)
-        {
-            relational.Activate(index);
+        {               
+            relational.Activate(index, customizableType); 
         }
         else
         {
             if (UIController.instance.coinAmount >= cost)
             {
                 UIController.instance.coinAmount -= cost;
-                isUnlocked = true;
+                isUnlocked = true;               
                 lockImage.gameObject.SetActive(false);
-                costText.gameObject.SetActive(false);
-                relational.Activate(index); // Activate the first child of the customizable object
+                costText.gameObject.SetActive(false);               
+                relational.Activate(index, customizableType);
             }
             else
             {
