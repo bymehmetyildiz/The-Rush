@@ -1,18 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
+
 
 public class UI_SlotManager : MonoBehaviour
 {
     public CustomizableType customizableType;
-    [SerializeField] private bool isUnlocked;
+    [SerializeField] private bool isUnlocked;    
     [SerializeField] private Image lockImage;
     [SerializeField] private int cost;
     [SerializeField] private TMP_Text costText;
 
-    [SerializeField] private Customizable relational;
+    public Customizable relational;    
     [SerializeField] private int index;
 
     void Start()
@@ -32,18 +33,36 @@ public class UI_SlotManager : MonoBehaviour
     public void UnlockSlot()
     {
         if (isUnlocked)
-        {               
-            relational.Activate(index, customizableType); 
+        { 
+            if (UIController.instance.currentSlot != this)
+            {
+                relational.Activate(index, customizableType);
+                UIController.instance.currentSlot = this;
+                UIController.instance.frame.gameObject.SetActive(true);
+                UIController.instance.frame.SetParent(this.transform);
+                UIController.instance.frame.anchoredPosition = Vector2.zero;                
+            }
+            else if (UIController.instance.currentSlot == this)
+            {
+                relational.Deactivate(index);
+                UIController.instance.currentSlot = null;
+                UIController.instance.frame.gameObject.SetActive(false);                
+            }
         }
         else
-        {
+        { 
             if (UIController.instance.coinAmount >= cost)
             {
                 UIController.instance.coinAmount -= cost;
-                isUnlocked = true;               
+                UIController.instance.coinText.text = FormatNumber(UIController.instance.coinAmount);
+                isUnlocked = true;                  
                 lockImage.gameObject.SetActive(false);
                 costText.gameObject.SetActive(false);               
                 relational.Activate(index, customizableType);
+                UIController.instance.currentSlot = this;
+                UIController.instance.frame.gameObject.SetActive(true);
+                UIController.instance.frame.SetParent(this.transform);
+                UIController.instance.frame.anchoredPosition = Vector2.zero;
             }
             else
             {
@@ -51,6 +70,15 @@ public class UI_SlotManager : MonoBehaviour
             }
         }
         
+    }
+
+    public bool IsEquipped()
+    {
+        if(relational.transform.GetChild(index).gameObject.activeSelf)
+        {
+            return true;
+        }
+        return false;
     }
 
 

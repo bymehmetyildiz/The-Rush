@@ -7,25 +7,30 @@ public class Customizable : MonoBehaviour
 {
     public List<GameObject> childs = new List<GameObject>();
     public CustomizableType customizableType;
-    public bool isOptional;
+    public bool isOptional;    
+    public GameObject objToHide;
 
     void Start()
     {
         for (int i = 0; i < transform.childCount; i++)
         {
-            GameObject child = transform.GetChild(i).gameObject;
+            GameObject child = transform.GetChild(i).gameObject;                    
             childs.Add(child);
             child.SetActive(false); // Deactivate all children initially
         }
         if (!isOptional)
         {
             childs[0].SetActive(true);
+            childs.RemoveAt(0);
         }
 
     }
 
     public void Activate(int index, CustomizableType _customizableType)
     {
+       if(objToHide != null)
+            objToHide.SetActive(false);
+
         for (int i = 0; i < childs.Count; i++)
         {
             if(_customizableType == customizableType)
@@ -33,6 +38,12 @@ public class Customizable : MonoBehaviour
         }
 
         childs[index].SetActive(true); // Activate the specified child
+    }
+
+    public void Deactivate(int index)
+    {
+        if(childs[index] != null)       
+            childs[index].SetActive(false);
     }
 }
 

@@ -1,44 +1,49 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using TMPro;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEditor;
-using DG.Tweening;
+using UnityEngine;
 
 public class UIController : MonoBehaviour
 {
     //Instance
     public static UIController instance;
 
-    //Buttons
+    [Header("Buttons")]
     [SerializeField] private GameObject startButton;
     [SerializeField] private GameObject pauseButton;
     [SerializeField] private GameObject pausePanel;
 
-    //Score
+    [Header("Score")]
     public TMP_Text scoreText;
     public int score;
 
-    //Coin
+    [Header("Coin")]
     [SerializeField] private GameObject coinPrefab;     
-    [SerializeField] private TMP_Text coinText;    
-    [SerializeField] private float offset;    
+    [SerializeField] private GameObject coinEndPoint;
+    [SerializeField] private Vector2 coinSpawnPoint;
+    [SerializeField] private float offset;
+    public TMP_Text coinText;    
     public int coinAmount;
     private Character character;
     public bool canSpawnCoin = false;
-    [SerializeField] private Vector2 coinSpawnPoint;
-    [SerializeField] private GameObject coinEndPoint;
 
-    //Customize Panel
+    [Header("Customize Panel")]
     [SerializeField] private RectTransform[] categories;
     [SerializeField] private RectTransform current;
     [SerializeField] private TMP_Text headerText;
     private int currentIndex = 0;
     private bool isSnapping;
-    [SerializeField] private List<UI_SlotManager> slots;
-    private UI_SlotManager currentSlot;
-    [SerializeField] private RectTransform frame;    
+    [SerializeField] private RectTransform customizePanel;
 
+    [Header("Frame")]
+    public UI_SlotManager currentSlot;
+    public RectTransform frame;
+
+   
+    
 
     private void Awake()
     {
@@ -58,7 +63,7 @@ public class UIController : MonoBehaviour
         character = FindObjectOfType<Character>();   
         canSpawnCoin = false;
 
-        coinAmount = 10000000;
+        coinAmount = 100000;
         coinText.text = FormatNumber(coinAmount);
 
         for (int i = 0; i < categories.Length; i++)
@@ -70,6 +75,8 @@ public class UIController : MonoBehaviour
         headerText.text = categories[0].gameObject.name;   
 
         frame.gameObject.SetActive(false);
+
+        customizePanel.anchoredPosition = new Vector2(-1000, 0);
     }
     
     void Update()
@@ -138,17 +145,33 @@ public class UIController : MonoBehaviour
                 categories[currentIndex]
                     .DOAnchorPos(new Vector2(0, 445), 0.5f)
                     .SetEase(Ease.OutBack)
-                    .OnComplete(() =>
-                    {
-                        current = categories[currentIndex];
-                        isSnapping = false;
-                    });
-                
+                   .OnComplete(() =>
+                   {
+                       current = categories[currentIndex];
+                       isSnapping = false;
+
+                       UI_SlotManager[] slots = current.GetComponentsInChildren<UI_SlotManager>();
+
+                       foreach (UI_SlotManager slot in slots)
+                       {
+                           if (slot.IsEquipped())
+                           {
+                               currentSlot = slot;
+                               frame.gameObject.SetActive(true);
+                               frame.SetParent(currentSlot.transform);
+                               frame.anchoredPosition = Vector2.zero;
+                               break;
+                           }
+                           else
+                           {
+                               currentSlot = null;
+                               frame.gameObject.SetActive(false);
+                           }
+                       }
+                   });
             }
             else
                 return;
-
-            
         }
         else
         {
@@ -165,12 +188,40 @@ public class UIController : MonoBehaviour
                     {
                         current = categories[currentIndex];
                         isSnapping = false;
+
+                        UI_SlotManager[] slots = current.GetComponentsInChildren<UI_SlotManager>();
+
+                        foreach (UI_SlotManager slot in slots)
+                        {
+                            if (slot.IsEquipped())
+                            {
+                                currentSlot = slot;
+                                frame.gameObject.SetActive(true);
+                                frame.SetParent(currentSlot.transform);
+                                frame.anchoredPosition = Vector2.zero;
+                                break;                                
+                            }
+                            else
+                            {
+                                currentSlot = null;
+                                frame.gameObject.SetActive(false);
+                            }
+
+                        }
+
                     });
-                
             }
             else
-                return;
+                return;          
         }
+    }
+
+    public void OpenCustomizePanel()
+    {
+        if(customizePanel.anchoredPosition.x != -200)
+            customizePanel.DOAnchorPos(new Vector2(-200, 0), 0.5f).SetEase(Ease.OutBack);
+        else if (customizePanel.anchoredPosition.x != -1000)
+            customizePanel.DOAnchorPos(new Vector2(-1000, 0), 0.5f).SetEase(Ease.InBack);
     }
 
     string FormatNumber(long number)
