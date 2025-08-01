@@ -16,14 +16,13 @@ public class Customizable : MonoBehaviour
         {
             GameObject child = transform.GetChild(i).gameObject;                    
             childs.Add(child);
-            child.SetActive(false); // Deactivate all children initially
+            child.SetActive(false);
         }
         if (!isOptional)
         {
             childs[0].SetActive(true);
             childs.RemoveAt(0);
         }
-
     }
 
     public void Activate(int index, CustomizableType _customizableType)
@@ -34,16 +33,19 @@ public class Customizable : MonoBehaviour
         for (int i = 0; i < childs.Count; i++)
         {
             if(_customizableType == customizableType)
-                childs[i].SetActive(false); // Deactivate all children
+                childs[i].SetActive(false);
         }
 
-        childs[index].SetActive(true); // Activate the specified child
+        childs[index].SetActive(true);
     }
 
     public void Deactivate(int index)
     {
         if(childs[index] != null)       
             childs[index].SetActive(false);
+
+        if (objToHide != null)
+            objToHide.SetActive(true);
     }
 }
 

@@ -27,6 +27,7 @@ public class UIController : MonoBehaviour
     [SerializeField] private float offset;
     public TMP_Text coinText;    
     public int coinAmount;
+    public int totalCoin;
     private Character character;
     public bool canSpawnCoin = false;
 
@@ -42,8 +43,11 @@ public class UIController : MonoBehaviour
     public UI_SlotManager currentSlot;
     public RectTransform frame;
 
-   
-    
+    [Header("Camera Adjustment")]
+    [SerializeField] private Cinemachine.CinemachineVirtualCamera virtualCamera;
+
+    [Header("End Panel")]
+    [SerializeField] private GameObject endPanel;
 
     private void Awake()
     {
@@ -63,7 +67,7 @@ public class UIController : MonoBehaviour
         character = FindObjectOfType<Character>();   
         canSpawnCoin = false;
 
-        coinAmount = 100000;
+        coinAmount = 0;
         coinText.text = FormatNumber(coinAmount);
 
         for (int i = 0; i < categories.Length; i++)
@@ -76,7 +80,7 @@ public class UIController : MonoBehaviour
 
         frame.gameObject.SetActive(false);
 
-        customizePanel.anchoredPosition = new Vector2(-1000, 0);
+        customizePanel.anchoredPosition = new Vector2(-1350, 0);
     }
     
     void Update()
@@ -128,7 +132,7 @@ public class UIController : MonoBehaviour
         }
         newCoin.transform.position = coinEndPoint.transform.position;
         coinAmount++;
-        coinText.text = coinAmount.ToString();        
+        coinText.text = FormatNumber(coinAmount);        
         Destroy(newCoin);
     }
 
@@ -218,10 +222,26 @@ public class UIController : MonoBehaviour
 
     public void OpenCustomizePanel()
     {
-        if(customizePanel.anchoredPosition.x != -200)
-            customizePanel.DOAnchorPos(new Vector2(-200, 0), 0.5f).SetEase(Ease.OutBack);
-        else if (customizePanel.anchoredPosition.x != -1000)
-            customizePanel.DOAnchorPos(new Vector2(-1000, 0), 0.5f).SetEase(Ease.InBack);
+        if (customizePanel.anchoredPosition.x != -650)
+        {
+            startButton.SetActive(false);
+            customizePanel.DOAnchorPos(new Vector2(-650, 0), 0.5f).SetEase(Ease.OutBack);
+            DOTween.To(() => virtualCamera.m_Lens.FieldOfView, x => virtualCamera.m_Lens.FieldOfView = x, 16.5f, 0.5f).SetEase(Ease.OutBack);
+        }
+        else if (customizePanel.anchoredPosition.x != -1350)
+        {
+            startButton.SetActive(true);
+            customizePanel.DOAnchorPos(new Vector2(-1350, 0), 0.5f).SetEase(Ease.InBack);
+            DOTween.To(() => virtualCamera.m_Lens.FieldOfView, x => virtualCamera.m_Lens.FieldOfView = x, 33.0f, 0.5f).SetEase(Ease.OutBack);
+        }
+    }
+
+    public void EndGame()
+    {
+        endPanel.SetActive(true);
+        pauseButton.SetActive(false);
+        Time.timeScale = 0f;
+        scoreText.text = score.ToString() + " m";
     }
 
     string FormatNumber(long number)

@@ -79,21 +79,18 @@ public class Character : MonoBehaviour
         if (isHit)
             return;
 
+        float currentMoveSpeed = isJumping ? moveSpeed * 0.75f : moveSpeed;
 
-        if (playerDirection == Direction.Forward)
-        {
-            playerVector = Vector3.forward * moveSpeed;
-        }
+        if (playerDirection == Direction.Forward)        
+            playerVector = Vector3.forward * currentMoveSpeed;
+        
 
-        else if (playerDirection == Direction.Right)
-        {
-            playerVector = Vector3.right * moveSpeed;
-        }
+        else if (playerDirection == Direction.Right)        
+            playerVector = Vector3.right * currentMoveSpeed;
+        
 
-        else if (playerDirection == Direction.Left)
-        {
-            playerVector = Vector3.left * moveSpeed;
-        }
+        else if (playerDirection == Direction.Left)        
+            playerVector = Vector3.left * currentMoveSpeed;
 
         // Horizontal Movement of the Player
         if (canMove && IsOnGround())
@@ -102,8 +99,6 @@ public class Character : MonoBehaviour
 
             animator.SetFloat("Input", horizontalInput);
             animator.SetBool("Strafe", horizontalInput != 0);
-
-
 
             switch (playerDirection)
             {
@@ -123,12 +118,10 @@ public class Character : MonoBehaviour
         else if (!IsOnGround())
             animator.SetBool("Strafe", false);
 
-
         if (canMove && (IsOnGround() || IsOnRightCorner() || IsOnLeftCorner()) && !isJumping)
             rb.velocity = playerVector;
-
-
-
+        else if (canMove && isJumping)
+            rb.velocity = new Vector3(playerVector.x, rb.velocity.y, playerVector.z);
     }
 
 
@@ -190,8 +183,6 @@ public class Character : MonoBehaviour
                 animator.SetBool("Crouch", true);
                 cc.center = Vector3.MoveTowards(cc.center, new Vector3(0, 0.45f, 0), 2f);
                 cc.height = Mathf.MoveTowards(cc.height, 0.9f, 2f);
-
-
             }
         }
         else if (crouchTimer > crouchDur)
@@ -211,7 +202,7 @@ public class Character : MonoBehaviour
     // Jumping
     public void Jump()
     {
-        rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);        
         isJumping = true;
         StartCoroutine(Land());
     }
@@ -232,6 +223,7 @@ public class Character : MonoBehaviour
 
         isJumping = false;
         animator.SetTrigger("Land");
+        
     }
 
     //Rotation
